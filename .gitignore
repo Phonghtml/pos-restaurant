@@ -1,0 +1,16 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# secrets and local config (ຢ່າ commit)
+.env
+.env.*
+*.bak
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.tsbuildinfo
