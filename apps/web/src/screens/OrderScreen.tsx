@@ -4,6 +4,7 @@ import { localOrder, type LocalOrder } from "../offline/localView";
 import { getCache } from "../offline/cache";
 import { enqueue, refreshCaches } from "../offline/outbox";
 import { uuid } from "../offline/uuid";
+import { QrPanel } from "../components/QrPanel";
 
 type Method = "cash" | "qr" | "card";
 
@@ -205,6 +206,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
             <option value="card">ບັດ</option>
           </select>
           <input style={{ marginTop: 8 }} placeholder={`ຈຳນວນ (ຫວ່າງ = ${remaining})`} inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          {method === "qr" && <QrPanel amount={Number(amount || remaining)} />}
           {method === "cash" && (
             <input style={{ marginTop: 8 }} placeholder="ເງິນທີ່ຮັບມາ (ເພື່ອຄິດເງິນທອນ)" inputMode="numeric" value={tendered} onChange={(e) => setTendered(e.target.value)} />
           )}
