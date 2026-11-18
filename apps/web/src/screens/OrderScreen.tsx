@@ -13,6 +13,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
   const [order, setOrder] = useState<LocalOrder | null>(null);
   const [picking, setPicking] = useState<MenuItem | null>(null);
   const [selected, setSelected] = useState<Record<string, string>>({});
+  const [qty, setQty] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -53,12 +54,12 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
 
   function tap(item: MenuItem) {
     if (item.priceLak === null) return setError(`${item.name}: ຍັງບໍ່ໄດ້ກຳນົດລາຄາ`);
-    if (item.optionGroups.length === 0) return addItem(item, []);
     setSelected({});
+    setQty(1);
     setPicking(item);
   }
 
-  function addItem(item: MenuItem, optionIds: string[]) {
+  function addItem(item: MenuItem, optionIds: string[], quantity: number) {
     const chosen = item.optionGroups.flatMap((g) => g.options.filter((o) => optionIds.includes(o.id)));
     const unitPriceLak = (item.priceLak ?? 0) + chosen.reduce((s, o) => s + o.extraPriceLak, 0);
     return act(() =>
@@ -68,7 +69,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
         menuItemId: item.id,
         name: item.name,
         unitPriceLak,
-        quantity: 1,
+        quantity,
         options: chosen.map((o) => ({ name: o.name, optionId: o.id, extraPriceLak: o.extraPriceLak })),
         optionIds,
         note: null,
@@ -82,7 +83,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
     if (missing) return setError(`ກະລຸນາເລືອກ: ${missing.name}`);
     const item = picking;
     setPicking(null);
-    addItem(item, Object.values(selected));
+    addItem(item, Object.values(selected), qty);
   }
 
   function pay() {
@@ -178,6 +179,11 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
       {isOpen && picking && (
         <div className="panel">
           <strong>{picking.name}</strong>
+          <div className="qty">
+            <button className="btn secondary small" onClick={() => setQty(Math.max(1, qty - 1))} disabled={qty <= 1}>−</button>
+            <span className="qty-num">{qty}</span>
+            <button className="btn secondary small" onClick={() => setQty(qty + 1)}>+</button>
+          </div>
           {picking.optionGroups.map((g) => (
             <div key={g.id} style={{ marginTop: 8 }}>
               <div className="sub">{g.name}{g.isRequired ? " *" : ""}</div>
@@ -190,7 +196,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
             </div>
           ))}
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button className="btn" onClick={confirmOptions}>ເພີ່ມລາຍການ</button>
+            <button className="btn" onClick={confirmOptions}>ເພີ່ມລາຍການ × {qty}</button>
             <button className="btn secondary" onClick={() => setPicking(null)}>ຍົກເລີກ</button>
           </div>
         </div>
