@@ -100,7 +100,7 @@ async function applyEvent(c: PoolClient, ev: any, branchId: string, staffId: str
     case "send_to_kitchen": {
       need(UUID.test(p.orderId), "invalid_ids");
       await openOrder(p.orderId);
-      await c.query(`UPDATE order_items SET sent_at = now() WHERE order_id = $1 AND sent_at IS NULL`, [p.orderId]);
+      await c.query(`UPDATE order_items SET sent_at = now() WHERE order_id = $1 AND sent_at IS NULL AND pending_confirm = false`, [p.orderId]);
       return;
     }
 
@@ -110,6 +110,8 @@ async function applyEvent(c: PoolClient, ev: any, branchId: string, staffId: str
       need(Number.isInteger(p.amountLak) && p.amountLak > 0, "invalid_amount");
       if (p.method !== "cash") need(!!p.reference, "reference_required");
       await openOrder(p.orderId);
+      const pend = await c.query(`SELECT 1 FROM order_items WHERE order_id = $1 AND pending_confirm LIMIT 1`, [p.orderId]);
+      if (pend.rows[0]) throw new Reject("pending_items_not_confirmed");
       const bal = await c.query(
         `SELECT o.total_lak - COALESCE((SELECT SUM(amount_lak) FROM payments WHERE order_id = o.id), 0) AS remaining
          FROM orders o WHERE o.id = $1`,

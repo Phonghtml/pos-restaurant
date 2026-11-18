@@ -58,6 +58,11 @@ paymentsRouter.post("/:id/payments", requireRole("admin", "cashier"), async (req
       await client.query("ROLLBACK");
       return void res.status(409).json({ error: "order_not_open" });
     }
+    const pend = await client.query(`SELECT 1 FROM order_items WHERE order_id = $1 AND pending_confirm LIMIT 1`, [String(req.params.id)]);
+    if (pend.rows[0]) {
+      await client.query("ROLLBACK");
+      return void res.status(409).json({ error: "pending_items_not_confirmed", detail: "ມີລາຍການຈາກລູກຄ້າທີ່ຍັງບໍ່ໄດ້ຢືນຢັນ" });
+    }
     if (fresh.total === 0) {
       await client.query("ROLLBACK");
       return void res.status(422).json({ error: "order_is_empty" });

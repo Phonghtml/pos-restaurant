@@ -99,7 +99,7 @@ ordersRouter.get("/:id", requireRole("admin", "cashier", "waiter"), async (req, 
     if (!orderRows[0]) return void res.status(404).json({ error: "order_not_found" });
 
     const { rows: itemRows } = await pool.query(
-      `SELECT id, menu_item_id, name_snapshot, unit_price_lak, options_snapshot, quantity, note, kitchen_status, sent_at
+      `SELECT id, menu_item_id, name_snapshot, unit_price_lak, options_snapshot, quantity, note, kitchen_status, sent_at, pending_confirm
        FROM order_items WHERE order_id = $1 ORDER BY created_at`,
       [String(req.params.id)]
     );
@@ -122,6 +122,7 @@ ordersRouter.get("/:id", requireRole("admin", "cashier", "waiter"), async (req, 
         note: i.note,
         kitchenStatus: i.kitchen_status,
         sentAt: i.sent_at,
+        pendingConfirm: i.pending_confirm,
       })),
     });
   } catch (err) {
@@ -204,6 +205,35 @@ ordersRouter.post("/:id/items", requireRole("admin", "cashier", "waiter"), async
     const totals = await recalcTotals(client, String(req.params.id));
     await client.query("COMMIT");
     res.status(201).json({ itemId: inserted.rows[0].id, totals });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    next(err);
+  } finally {
+    client.release();
+  }
+});
+
+// POST /api/orders/:id/confirm-items
+// ພະນັກງານຢືນຢັນລາຍການທີ່ລູກຄ້າສັ່ງຜ່ານ QR ແລ້ວ (ຫຼັງຢືນຢັນ ສາມາດກົດສົ່ງໄປຄົວໄດ້)
+ordersRouter.post("/:id/confirm-items", requireRole("admin", "cashier", "waiter"), async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const order = await client.query(`SELECT status FROM orders WHERE id = $1 FOR UPDATE`, [String(req.params.id)]);
+    if (!order.rows[0]) {
+      await client.query("ROLLBACK");
+      return void res.status(404).json({ error: "order_not_found" });
+    }
+    if (order.rows[0].status !== "open") {
+      await client.query("ROLLBACK");
+      return void res.status(409).json({ error: "order_not_open" });
+    }
+    const r = await client.query(
+      `UPDATE order_items SET pending_confirm = false WHERE order_id = $1 AND pending_confirm RETURNING id`,
+      [String(req.params.id)]
+    );
+    await client.query("COMMIT");
+    res.json({ confirmedCount: r.rowCount });
   } catch (err) {
     await client.query("ROLLBACK");
     next(err);

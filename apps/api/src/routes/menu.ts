@@ -4,11 +4,9 @@ import { requireAuth } from "../auth";
 
 export const menuRouter = Router();
 
-// GET /api/menu?branchId=...
-// ສົ່ງໝວດໝູ່, ເມນູ ແລະ ຕົວເລືອກ ໃນຄຳຂໍດຽວ (ໃຊ້ໄດ້ທັງ online ແລະ ການ cache ໄວ້ offline)
-menuRouter.get("/", requireAuth, async (req, res, next) => {
-  try {
-    const branchId = req.user!.branchId;
+// ໂຫຼດເມນູທັງໝົດຂອງສາຂາ (ໝວດ > ເມນູ > ກຸ່ມຕົວເລືອກ > ຕົວເລືອກ)
+export async function loadMenu(branchId: string) {
+
 
     const { rows } = await pool.query(
       `
@@ -83,7 +81,13 @@ menuRouter.get("/", requireAuth, async (req, res, next) => {
       }
     }
 
-    res.json({ categories: [...categories.values()] });
+  return [...categories.values()];
+}
+
+// GET /api/menu
+menuRouter.get("/", requireAuth, async (req, res, next) => {
+  try {
+    res.json({ categories: await loadMenu(req.user!.branchId) });
   } catch (err) {
     next(err);
   }

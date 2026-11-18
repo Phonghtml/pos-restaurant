@@ -20,9 +20,9 @@ export function clearSession() {
 }
 
 // ໜ້າທີ່ແຕ່ລະ role ເຫັນ (ຕ້ອງກົງກັບສິດໃນ API)
-export function screensFor(role: Role): ("tables" | "kitchen" | "reports")[] {
+export function screensFor(role: Role): ("tables" | "kitchen" | "reports" | "qr")[] {
   switch (role) {
-    case "admin": return ["tables", "kitchen", "reports"];
+    case "admin": return ["tables", "kitchen", "reports", "qr"];
     case "cashier":
     case "waiter": return ["tables"];
     case "kitchen": return ["kitchen"];

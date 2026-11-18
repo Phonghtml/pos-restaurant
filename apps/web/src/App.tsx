@@ -3,6 +3,7 @@ import { TablesScreen } from "./screens/TablesScreen";
 import { OrderScreen } from "./screens/OrderScreen";
 import { KitchenScreen } from "./screens/KitchenScreen";
 import { ReportsScreen } from "./screens/ReportsScreen";
+import { QrScreen } from "./screens/QrScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { clearSession, getSession, screensFor } from "./session";
 import { api } from "./api";
@@ -13,7 +14,8 @@ type View =
   | { name: "tables" }
   | { name: "order"; tableName: string; orderId: string }
   | { name: "kitchen" }
-  | { name: "reports" };
+  | { name: "reports" }
+  | { name: "qr" };
 
 export function App() {
   const [session, setSession] = useState(getSession());
@@ -53,6 +55,7 @@ export function App() {
           {screens.includes("tables") && <button onClick={() => setView({ name: "tables" })}>ໂຕະ</button>}{" "}
           {screens.includes("kitchen") && <button onClick={() => setView({ name: "kitchen" })}>ຄົວ</button>}{" "}
           {screens.includes("reports") && <button onClick={() => setView({ name: "reports" })}>ລາຍງານ</button>}{" "}
+          {screens.includes("qr") && <button onClick={() => setView({ name: "qr" })}>QR</button>}{" "}
           <button onClick={logout}>ອອກ</button>
         </div>
       </header>
@@ -66,6 +69,7 @@ export function App() {
         )}
         {current.name === "kitchen" && <KitchenScreen />}
         {current.name === "reports" && <ReportsScreen />}
+        {current.name === "qr" && <QrScreen />}
       </main>
     </>
   );

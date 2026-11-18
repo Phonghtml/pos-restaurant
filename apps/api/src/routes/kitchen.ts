@@ -26,7 +26,7 @@ kitchenRouter.post("/orders/:id/send-to-kitchen", requireRole("admin", "cashier"
     }
     const sent = await client.query(
       `UPDATE order_items SET sent_at = now()
-       WHERE order_id = $1 AND sent_at IS NULL
+       WHERE order_id = $1 AND sent_at IS NULL AND pending_confirm = false
        RETURNING id, name_snapshot, quantity, options_snapshot, note`,
       [String(req.params.id)]
     );

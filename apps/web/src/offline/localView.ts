@@ -10,6 +10,7 @@ export type LocalItem = {
   options: { name: string }[];
   note: string | null;
   sentAt: string | null;
+  pendingConfirm?: boolean;
 };
 
 export type LocalOrder = {

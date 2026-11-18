@@ -373,3 +373,14 @@ input:focus, select:focus {
 .qty { display: flex; align-items: center; gap: 14px; margin: 10px 0 4px; }
 .qty .btn.small { width: 38px; height: 38px; padding: 0; font-size: 20px; border-radius: 50%; }
 .qty-num { font-size: 20px; font-weight: 800; min-width: 28px; text-align: center; }
+
+/* ===== ໜ້າ QR ແລະ ການພິມ ===== */
+.qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.qr-card { text-align: center; }
+.qr-card img { width: 100%; max-width: 220px; }
+.qr-url { word-break: break-all; font-size: 11px; }
+@media print {
+  header, .no-print, .status-bar { display: none !important; }
+  .qr-card { break-inside: avoid; }
+  body { background: #fff; }
+}

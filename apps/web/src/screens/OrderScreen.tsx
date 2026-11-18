@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fmt, type MenuCategory, type MenuItem } from "../api";
+import { api, fmt, type MenuCategory, type MenuItem } from "../api";
 import { localOrder, type LocalOrder } from "../offline/localView";
 import { getCache } from "../offline/cache";
 import { enqueue, refreshCaches } from "../offline/outbox";
@@ -33,11 +33,17 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
     load();
     const onData = () => load();
     window.addEventListener("pos:data", onData);
-    return () => window.removeEventListener("pos:data", onData);
+    // ອັບເດດອໍເດີທີ່ລູກຄ້າສັ່ງຜ່ານ QR ທຸກ 5 ວິນາທີ
+    const timer = setInterval(() => { void refreshCaches([orderId]).then(load); }, 5000);
+    return () => {
+      window.removeEventListener("pos:data", onData);
+      clearInterval(timer);
+    };
   }, [orderId]);
 
   const isOpen = order?.status === "open";
-  const unsent = order?.items.filter((i) => !i.sentAt).length ?? 0;
+  const unsent = order?.items.filter((i) => !i.sentAt && !i.pendingConfirm).length ?? 0;
+  const pendingCount = order?.items.filter((i) => i.pendingConfirm).length ?? 0;
   const remaining = order?.remainingLak ?? 0;
 
   async function act(fn: () => Promise<unknown>, ok?: string) {
@@ -83,7 +89,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
     if (missing) return setError(`ກະລຸນາເລືອກ: ${missing.name}`);
     const item = picking;
     setPicking(null);
-    addItem(item, Object.values(selected), qty);
+    addItem(item, Object.values(selected).filter(Boolean), qty);
   }
 
   function pay() {
@@ -128,7 +134,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
         {order.items.map((i) => (
           <div className="row" key={i.id}>
             <div>
-              {i.name} × {i.quantity}
+              {i.name} × {i.quantity}{i.pendingConfirm && <span className="tag">ລໍຖ້າຢືນຢັນ</span>}
               {i.options.length > 0 && <div className="sub">{i.options.map((o) => o.name).join(", ")}</div>}
             </div>
             <div>
@@ -143,6 +149,12 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
           </div>
         ))}
         <div className="total-box"><span>ລວມທັງໝົດ</span><strong>{fmt(order.totalLak)}</strong></div>
+        {isOpen && pendingCount > 0 && (
+          <button className="btn secondary" style={{ marginTop: 8, width: "100%" }}
+            onClick={() => act(async () => { await api("POST", `/api/orders/${orderId}/confirm-items`); await refreshCaches([orderId]); }, "ຢືນຢັນລາຍການຈາກລູກຄ້າແລ້ວ")}>
+            ຢືນຢັນລາຍການຈາກລູກຄ້າ ({pendingCount})
+          </button>
+        )}
         {isOpen && (
           <button className="btn" style={{ marginTop: 8, width: "100%" }} disabled={unsent === 0}
             onClick={() => act(() => enqueue("send_to_kitchen", { orderId }), "ສົ່ງໄປຄົວແລ້ວ")}>
