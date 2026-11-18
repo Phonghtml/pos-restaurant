@@ -306,3 +306,54 @@ input:focus, select:focus {
   .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   h2 { font-size: 19px; }
 }
+
+/* ===== ເມນູແບບແຖວ (ຄືໜ້າ delivery) ===== */
+.menu-cat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 18px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--brand-soft);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--brand-dark);
+}
+.menu-cat .count { font-size: 13px; font-weight: 500; color: var(--muted); }
+.menu-list { display: flex; flex-direction: column; gap: 8px; }
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: box-shadow 0.12s, border-color 0.12s;
+}
+.menu-row:hover { box-shadow: var(--shadow-hover); border-color: var(--brand); }
+.menu-row:active { transform: scale(0.99); }
+.thumb {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffd3c4, #ffb199);
+  color: var(--brand-dark);
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.menu-info { flex: 1; min-width: 0; }
+.menu-name { font-weight: 700; font-size: 15px; }
+.menu-desc { color: var(--muted); font-size: 13px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-row .price { flex: 0 0 auto; margin-top: 0; font-size: 14px; white-space: nowrap; }

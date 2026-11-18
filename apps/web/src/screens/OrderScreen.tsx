@@ -155,14 +155,17 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
           <strong>ເມນູ</strong>
           {menu.map((c) => (
             <div key={c.id} style={{ marginTop: 8 }}>
-              <div className="sub">{c.name}</div>
-              <div className="grid">
+              <div className="menu-cat"><span>{c.name}</span><span className="count">{c.items.length} ລາຍການ</span></div>
+              <div className="menu-list">
                 {c.items.map((item) => (
-                  <button key={item.id} className="card menu-card" onClick={() => tap(item)}>
-                    {item.name}
-                    {item.isSignature && <span className="tag signature">signature</span>}
-                    <div className="price">{item.priceLak === null ? "ຍັງບໍ່ມີລາຄາ" : fmt(item.priceLak)}</div>
-                  </button>
+                  <button key={item.id} className="menu-row" onClick={() => tap(item)}>
+                      <div className="thumb">{item.name.charAt(0)}</div>
+                      <div className="menu-info">
+                        <div className="menu-name">{item.name}{item.isSignature && <span className="tag signature">signature</span>}</div>
+                        <div className="menu-desc">{item.optionGroups.map((g) => g.name).join(" · ") || " "}</div>
+                      </div>
+                      <div className="price">{item.priceLak === null ? "ຍັງບໍ່ມີລາຄາ" : fmt(item.priceLak)}</div>
+                    </button>
                 ))}
               </div>
             </div>
