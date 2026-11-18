@@ -159,7 +159,7 @@ export function OrderScreen({ orderId, tableName, onBack }: { orderId: string; t
               <div className="menu-list">
                 {c.items.map((item) => (
                   <button key={item.id} className="menu-row" onClick={() => tap(item)}>
-                      <div className="thumb">{item.name.charAt(0)}</div>
+                      <div className="thumb">{item.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : item.name.charAt(0)}</div>
                       <div className="menu-info">
                         <div className="menu-name">{item.name}{item.isSignature && <span className="tag signature">signature</span>}</div>
                         <div className="menu-desc">{item.optionGroups.map((g) => g.name).join(" · ") || " "}</div>

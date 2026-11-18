@@ -44,6 +44,7 @@ CREATE TABLE menu_items (
   name          TEXT NOT NULL,
   price_lak     NUMERIC(12,0),            -- NULL = ຍັງບໍ່ໄດ້ກຳນົດລາຄາ
   is_signature  BOOLEAN NOT NULL DEFAULT false,
+  image_url     TEXT,                     -- ເສັ້ນທາງຮູບ ເຊັ່ນ /menu/ເຂົ້າປຽກໝູ່.jpg (NULL = ໃຊ້ຕົວອັກສອນແທນ)
   is_active     BOOLEAN NOT NULL DEFAULT true,
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );

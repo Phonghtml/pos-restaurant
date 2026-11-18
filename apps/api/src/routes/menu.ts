@@ -20,6 +20,7 @@ menuRouter.get("/", requireAuth, async (req, res, next) => {
         i.name AS item_name,
         i.price_lak,
         i.is_signature,
+        i.image_url,
         g.id AS group_id,
         g.name AS group_name,
         g.is_required,
@@ -42,6 +43,7 @@ menuRouter.get("/", requireAuth, async (req, res, next) => {
       id: string;
       name: string;
       priceLak: number | null;
+      imageUrl: string | null;
       isSignature: boolean;
       optionGroups: Group[];
     };
@@ -61,6 +63,7 @@ menuRouter.get("/", requireAuth, async (req, res, next) => {
           name: r.item_name,
           priceLak: r.price_lak === null ? null : Number(r.price_lak),
           isSignature: r.is_signature,
+          imageUrl: r.image_url ?? null,
           optionGroups: [],
         };
         items.set(r.item_id, item);

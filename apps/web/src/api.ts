@@ -31,5 +31,5 @@ export const fmt = (n: number | null | undefined) =>
 
 export type MenuOption = { id: string; name: string; extraPriceLak: number };
 export type MenuGroup = { id: string; name: string; isRequired: boolean; options: MenuOption[] };
-export type MenuItem = { id: string; name: string; priceLak: number | null; isSignature: boolean; optionGroups: MenuGroup[] };
+export type MenuItem = { id: string; name: string; priceLak: number | null; imageUrl: string | null; isSignature: boolean; optionGroups: MenuGroup[] };
 export type MenuCategory = { id: string; name: string; items: MenuItem[] };
